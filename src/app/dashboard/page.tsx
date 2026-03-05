@@ -49,8 +49,8 @@ export default function DashboardPage() {
     { key: 'status', label: 'ステータス' },
     { key: 'stepsCount', label: 'ステップ数' },
     { key: 'executionCount', label: '実行回数' },
-    { key: 'createdAt', label: '作成日', format: (v: string) => new Date(v).toLocaleDateString('ja-JP') },
-    { key: 'updatedAt', label: '更新日', format: (v: string) => new Date(v).toLocaleDateString('ja-JP') },
+    { key: 'createdAt', label: '作成日', format: (v: unknown) => new Date(String(v)).toLocaleDateString('ja-JP') },
+    { key: 'updatedAt', label: '更新日', format: (v: unknown) => new Date(String(v)).toLocaleDateString('ja-JP') },
   ];
 
   if (!mounted) {
