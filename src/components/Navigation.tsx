@@ -3,22 +3,23 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Home, LayoutDashboard, Wrench, ScrollText, FileText, Link2, Brain, Wallet, Zap, Shield, MessageSquare, MoreHorizontal, Bot } from 'lucide-react';
 
 const MAIN_NAV = [
-  { href: '/', label: 'ホーム', icon: '🏠' },
-  { href: '/dashboard', label: 'ダッシュボード', icon: '📊' },
-  { href: '/editor', label: 'エディタ', icon: '🔧' },
-  { href: '/logs', label: 'ログ', icon: '📜' },
+  { href: '/', label: 'ホーム', icon: Home },
+  { href: '/dashboard', label: 'ダッシュボード', icon: LayoutDashboard },
+  { href: '/editor', label: 'エディタ', icon: Wrench },
+  { href: '/logs', label: 'ログ', icon: ScrollText },
 ] as const;
 
 const MORE_NAV = [
-  { href: '/templates', label: 'テンプレート', icon: '📋' },
-  { href: '/nodes', label: 'ノード', icon: '🔗' },
-  { href: '/models', label: 'LLMモデル', icon: '🧠' },
-  { href: '/cost', label: 'コスト分析', icon: '💰' },
-  { href: '/benchmark', label: 'ベンチマーク', icon: '⚡' },
-  { href: '/errors', label: 'エラー対策', icon: '🛡️' },
-  { href: '/advisory', label: 'アドバイザリー', icon: '📝' },
+  { href: '/templates', label: 'テンプレート', icon: FileText },
+  { href: '/nodes', label: 'ノード', icon: Link2 },
+  { href: '/models', label: 'LLMモデル', icon: Brain },
+  { href: '/cost', label: 'コスト分析', icon: Wallet },
+  { href: '/benchmark', label: 'ベンチマーク', icon: Zap },
+  { href: '/errors', label: 'エラー対策', icon: Shield },
+  { href: '/advisory', label: 'アドバイザリー', icon: MessageSquare },
 ] as const;
 
 export default function Navigation() {
@@ -42,73 +43,82 @@ export default function Navigation() {
   }, [moreOpen, handleClickOutside]);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur-sm" data-testid="navigation">
-      {/* More Menu Popup */}
-      {moreOpen && (
-        <div
-          ref={menuRef}
-          className="absolute bottom-full left-0 right-0 border-t border-gray-200 bg-white shadow-lg"
-          data-testid="more-menu"
-        >
-          <div className="mx-auto max-w-lg grid grid-cols-4 gap-1 px-2 py-3">
-            {MORE_NAV.map((item) => {
-              const isActive = pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMoreOpen(false)}
-                  className={`flex flex-col items-center gap-1 rounded-lg p-2 text-xs transition-colors ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-600 font-semibold'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                  data-testid={`nav-${item.href.slice(1)}`}
-                >
-                  <span className="text-lg">{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+    <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-100" data-testid="navigation">
+      <div className="mx-auto flex max-w-lg items-center justify-between px-3 py-2">
+        <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center">
+            <Bot className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-gray-900 hidden sm:block text-sm">AgentKit</span>
+        </Link>
+        <div className="flex items-center gap-1">
+          {MAIN_NAV.map((item) => {
+            const isActive = item.href === '/'
+              ? pathname === '/'
+              : pathname.startsWith(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  isActive
+                    ? 'bg-gradient-to-r from-violet-50 to-indigo-50 text-indigo-700 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+                data-testid={`nav-${item.href === '/' ? 'home' : item.href.slice(1)}`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {/* More dropdown */}
+          <div className="relative" ref={menuRef}>
+            <button
+              onClick={() => setMoreOpen(!moreOpen)}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                isMoreActive || moreOpen
+                  ? 'bg-gradient-to-r from-violet-50 to-indigo-50 text-indigo-700 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+              data-testid="nav-more"
+              aria-expanded={moreOpen}
+              aria-label="その他のメニュー"
+            >
+              <MoreHorizontal className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">その他</span>
+            </button>
+            {moreOpen && (
+              <div
+                className="absolute right-0 top-full mt-1 w-48 bg-white/95 backdrop-blur-xl rounded-xl border border-gray-100 shadow-lg py-1 z-50"
+                data-testid="more-menu"
+              >
+                {MORE_NAV.map((item) => {
+                  const isActive = pathname.startsWith(item.href);
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setMoreOpen(false)}
+                      className={`flex items-center gap-2.5 px-4 py-2.5 text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-gradient-to-r from-violet-50 to-indigo-50 text-indigo-700'
+                          : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                      }`}
+                      data-testid={`nav-${item.href.slice(1)}`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      <div className="mx-auto flex max-w-lg items-center justify-around">
-        {MAIN_NAV.map((item) => {
-          const isActive = item.href === '/'
-            ? pathname === '/'
-            : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
-                isActive
-                  ? 'text-indigo-600 font-semibold'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-              data-testid={`nav-${item.href === '/' ? 'home' : item.href.slice(1)}`}
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-        <button
-          onClick={() => setMoreOpen(!moreOpen)}
-          className={`flex flex-1 flex-col items-center gap-0.5 py-3 text-xs transition-colors ${
-            isMoreActive || moreOpen
-              ? 'text-indigo-600 font-semibold'
-              : 'text-gray-500 hover:text-gray-700'
-          }`}
-          data-testid="nav-more"
-          aria-expanded={moreOpen}
-          aria-label="その他のメニュー"
-        >
-          <span className="text-xl">{'⋯'}</span>
-          <span>その他</span>
-        </button>
       </div>
     </nav>
   );
